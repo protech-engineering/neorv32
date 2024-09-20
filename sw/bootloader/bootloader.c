@@ -322,7 +322,7 @@ int main(void) {
   // ------------------------------------------------
   // Auto boot sequence
   // ------------------------------------------------
-#if (SPI_EN != 0)
+#if (SPI_EN != 0 || XIP_EN != 0)
 #if (AUTO_BOOT_TIMEOUT != 0)
   if (neorv32_mtime_available()) {
 
@@ -339,10 +339,17 @@ int main(void) {
       }
 
       if (neorv32_mtime_get_time() >= timeout_time) { // timeout? start auto boot sequence
+#if (SPI_EN != 0)
         get_exe(EXE_STREAM_FLASH); // try booting from flash
         PRINT_TEXT("\n");
         start_app(0);
         while(1);
+#endif
+
+#if (XIP_EN != 0)
+        start_app(1);
+        while(1);
+#endif
       }
 
     }
